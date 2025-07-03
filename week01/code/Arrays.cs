@@ -8,12 +8,17 @@ public static class Arrays
     /// <returns>array of doubles that are the multiples of the supplied number</returns>
     public static double[] MultiplesOf(double number, int length)
     {
-        // TODO Problem 1 Start
-        // Remember: Using comments in your program, write down your process for solving this problem
-        // step by step before you write the code. The plan should be clear enough that it could
-        // be implemented by another person.
-
-        return []; // replace this return statement with your own
+        // Step 1: Create a new double array with the size equal to lenght
+        // Step 2: Create a for loop that goes from 0 to length -1
+        // Step 3: In each position 'i', place 'number * (i + 1)'
+        // Step 4: Return the filled array
+    
+        double[] multiples = new double[length];
+        for (int i = 0; i < length; i++)
+        {
+            multiples[i] = number * (i + 1);
+        }
+        return multiples;
     }
 
     /// <summary>
@@ -25,9 +30,18 @@ public static class Arrays
     /// </summary>
     public static void RotateListRight(List<int> data, int amount)
     {
-        // TODO Problem 2 Start
-        // Remember: Using comments in your program, write down your process for solving this problem
-        // step by step before you write the code. The plan should be clear enough that it could
-        // be implemented by another person.
+        // Step 1: Check how many elements there are in total (data.Count)
+        // Step 2: Split the last 'amount' elements using GetRange
+        // Step 3: Split the remaining elements (from the beginning to Count - amount)
+        // Step 4: Clear the original list using Clear()
+        // Step 5: Add the two chunks back, first the end, then the beginning
+
+        int n = data.Count;
+        List<int> endPart = data.GetRange(n - amount, amount);
+        List<int> startPart = data.GetRange(0, n - amount);
+        data.Clear();
+
+        data.AddRange(endPart);
+        data.AddRange(startPart);
     }
 }
