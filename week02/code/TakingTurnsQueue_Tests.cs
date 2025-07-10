@@ -12,6 +12,9 @@ public class TakingTurnsQueueTests
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
     // Defect(s) Found: 
+    //  - People with 1 turn were not being removed from the queue properly (they were returned again).
+    //  - Persons with 1 turn were not being decremented or excluded.
+    //  - Fixed logic in GetNextPerson to handle Turns == 1.
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -44,6 +47,9 @@ public class TakingTurnsQueueTests
     // After running 5 times, add George with 3 turns.  Run until the queue is empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
     // Defect(s) Found: 
+    //  - Same issue as above: Turn countdown logic was incorrect.
+    //  - Person with 1 turn was not removed properly.
+    //  - Added support for dynamic insertion.
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -86,6 +92,9 @@ public class TakingTurnsQueueTests
     // Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
     // Defect(s) Found: 
+    //  - People with 0 turns (infinite) were not being re-added to the queue.
+    //  - Infinite turn users were being treated like finite turn users.
+    //  - Fixed logic so that Turns <= 0 always get re-queued without changes.
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
@@ -116,7 +125,10 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found:
+    //  - Same as previous: People with negative turns (infinite) were not being re-added to the queue.
+    //  - Turn values were not preserved for infinite users.
+    //  - Fixed so negative turns are recognized as infinite and remain unchanged. 
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -144,6 +156,7 @@ public class TakingTurnsQueueTests
     // Scenario: Try to get the next person from an empty queue
     // Expected Result: Exception should be thrown with appropriate error message.
     // Defect(s) Found: 
+    // - No defects found.
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
