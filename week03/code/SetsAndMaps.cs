@@ -21,8 +21,26 @@ public static class SetsAndMaps
     /// <param name="words">An array of 2-character words (lowercase, no duplicates)</param>
     public static string[] FindPairs(string[] words)
     {
-        // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        var wordSet = new HashSet<string>(words);
+        var result = new List<string>();
+
+        foreach (var word in words)
+        {
+            if (word[0] == word[1])
+            {
+                continue;
+            }
+            var reversed = new string(new[] { word[1], word[0] });
+
+            if (wordSet.Contains(reversed))
+            {
+                result.Add($"{word} & {reversed}");
+                wordSet.Remove(word);
+                wordSet.Remove(reversed);
+            }
+        }
+
+        return result.ToArray();
     }
 
     /// <summary>
@@ -42,7 +60,13 @@ public static class SetsAndMaps
         foreach (var line in File.ReadLines(filename))
         {
             var fields = line.Split(",");
-            // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length < 4) continue;
+            var degree = fields[3].Trim();
+
+            if (degrees.ContainsKey(degree))
+                degrees[degree]++;
+            else
+                degrees[degree] = 1;
         }
 
         return degrees;
@@ -66,24 +90,46 @@ public static class SetsAndMaps
     /// </summary>
     public static bool IsAnagram(string word1, string word2)
     {
-        // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        string Normalize(string word) => new string(word
+            .ToLower().Where(char.IsLetterOrDigit).ToArray());
+
+        var w1 = Normalize(word1);
+        var w2 = Normalize(word2);
+
+        if (w1.Length != w2.Length) return false;
+
+        var dict = new Dictionary<char, int>();
+
+        foreach (var ch in w1)
+        {
+            if (!dict.ContainsKey(ch)) dict[ch] = 0;
+            dict[ch]++;
+        }
+
+        foreach (var ch in w2)
+        {
+            if (!dict.ContainsKey(ch)) return false;
+            dict[ch]--;
+            if (dict[ch] < 0) return false;
+        }
+
+        return true;
     }
 
     /// <summary>
-    /// This function will read JSON (Javascript Object Notation) data from the 
-    /// United States Geological Service (USGS) consisting of earthquake data.
-    /// The data will include all earthquakes in the current day.
-    /// 
-    /// JSON data is organized into a dictionary. After reading the data using
-    /// the built-in HTTP client library, this function will return a list of all
-    /// earthquake locations ('place' attribute) and magnitudes ('mag' attribute).
-    /// Additional information about the format of the JSON data can be found 
-    /// at this website:  
-    /// 
-    /// https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
-    /// 
-    /// </summary>
+/// This function will read JSON (Javascript Object Notation) data from the 
+/// United States Geological Service (USGS) consisting of earthquake data.
+/// The data will include all earthquakes in the current day.
+/// 
+/// JSON data is organized into a dictionary. After reading the data using
+/// the built-in HTTP client library, this function will return a list of all
+/// earthquake locations ('place' attribute) and magnitudes ('mag' attribute).
+/// Additional information about the format of the JSON data can be found 
+/// at this website:  
+/// 
+/// https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
+/// 
+/// </summary>
     public static string[] EarthquakeDailySummary()
     {
         const string uri = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
@@ -96,11 +142,18 @@ public static class SetsAndMaps
 
         var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
 
-        // TODO Problem 5:
-        // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
-        // on those classes so that the call to Deserialize above works properly.
-        // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
-        // 3. Return an array of these string descriptions.
-        return [];
+        if (featureCollection?.Features == null) return [];
+
+        var result = new List<string>();
+        foreach (var feature in featureCollection.Features)
+        {
+            var place = feature.Properties?.Place;
+            var mag = feature.Properties?.Mag;
+
+            if (!string.IsNullOrEmpty(place) && mag.HasValue)
+                result.Add($"{place} - Mag {mag.Value}");
+        }
+
+        return result.ToArray();
     }
 }
